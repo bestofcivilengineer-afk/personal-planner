@@ -1,0 +1,49 @@
+export type Domain = "work" | "university" | "scouting" | "personal";
+export type TaskType = "daily" | "weekly" | "monthly" | "once";
+export type ViewMode = "day" | "week" | "month";
+
+export interface DomainConfig {
+  key: Domain;
+  label: string;
+  icon: string;
+  color: string; // hex accent
+}
+
+export const DOMAINS: DomainConfig[] = [
+  { key: "work", label: "Δουλειά", icon: "ti-briefcase", color: "#3D5A80" },
+  { key: "university", label: "Πανεπιστήμιο", icon: "ti-school", color: "#B5891C" },
+  { key: "scouting", label: "Προσκοπικό", icon: "ti-tent", color: "#2F6B4F" },
+  { key: "personal", label: "Προσωπικά", icon: "ti-user", color: "#7A4869" },
+];
+
+export const TASK_TYPE_LABELS: Record<TaskType, string> = {
+  daily: "Καθημερινό",
+  weekly: "Εβδομαδιαίο",
+  monthly: "Μηνιαίο",
+  once: "Εφάπαξ",
+};
+
+export interface Task {
+  id: string;
+  domain: Domain;
+  title: string;
+  type: TaskType;
+  active: boolean;
+  created_at: string;
+}
+
+export interface TaskCompletion {
+  id: string;
+  task_id: string;
+  completed_on: string; // yyyy-MM-dd
+}
+
+export interface EventItem {
+  id: string;
+  domain: Domain;
+  title: string;
+  event_date: string; // yyyy-MM-dd
+  start_time: string; // HH:mm
+  end_time: string | null;
+  location: string | null;
+}
