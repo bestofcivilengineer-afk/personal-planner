@@ -22,10 +22,23 @@ export function isTaskDueOn(task: Task, date: Date, completions: TaskCompletion[
     return !taskCompletions.some((c) => isWithinInterval(parseISO(c.completed_on), { start, end }));
   }
 
-  // once: stays "due" every day (including past days shown) until completed once, ever.
-  // Only show from its creation date onwards, and not for future dates beyond today.
+  if (task.type === "weekdays") {
+    const dow = date.getDay(); // 0 = Κυριακή, 6 = Σάββατο
+    if (dow === 0 || dow === 6) return false;
+    return !taskCompletions.some((c) => c.completed_on === dateStr);
+  }
+
+  if (task.type === "daily_except_sunday") {
+    if (date.getDay() === 0) return false;
+    return !taskCompletions.some((c) => c.completed_on === dateStr);
+  }
+
+  // once: stays "due" from its creation date up to and including today, until it's
+  // completed. It never shows on future dates it hasn't "arrived" at yet — it only
+  // starts appearing on the next day if it was left undone.
   const createdDate = format(parseISO(task.created_at), "yyyy-MM-dd");
-  return taskCompletions.length === 0 && dateStr >= createdDate;
+  const todayStr = format(new Date(), "yyyy-MM-dd");
+  return taskCompletions.length === 0 && dateStr >= createdDate && dateStr <= todayStr;
 }
 
 // Is this task checked off ON this specific date (for showing checkbox state)?
