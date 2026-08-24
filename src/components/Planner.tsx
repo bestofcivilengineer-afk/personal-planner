@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase";
-import { Domain, DOMAINS, EventItem, Task, TaskCompletion, ViewMode, TASK_TYPE_LABELS } from "@/lib/types";
+import { Domain, DOMAINS, EventItem, Task, TaskCompletion, TaskType, ViewMode, TASK_TYPE_LABELS } from "@/lib/types";
 import { isTaskDueOn, isTaskDoneOn } from "@/lib/taskLogic";
 import {
   format,
@@ -25,6 +25,9 @@ export default function Planner({ userId }: { userId: string }) {
   const [tab, setTab] = useState<TabKey>("general");
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [itemFilter, setItemFilter] = useState<"all" | "events" | "tasks">("all");
+  const ALL_TASK_TYPES: TaskType[] = ["once", "daily", "weekdays", "daily_except_sunday", "weekly", "monthly"];
+  const [selectedTaskTypes, setSelectedTaskTypes] = useState<Set<TaskType>>(new Set(ALL_TASK_TYPES));
+  const [typeFilterOpen, setTypeFilterOpen] = useState(false);
   const [anchorDate, setAnchorDate] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completions, setCompletions] = useState<TaskCompletion[]>([]);
@@ -158,7 +161,7 @@ export default function Planner({ userId }: { userId: string }) {
         </div>
 
         {/* Item filter */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 10, alignItems: "center", flexWrap: "wrap" }}>
           {(["all", "events", "tasks"] as const).map((f) => (
             <button
               key={f}
@@ -175,6 +178,91 @@ export default function Planner({ userId }: { userId: string }) {
               {f === "all" ? "Όλα" : f === "events" ? "Μόνο events" : "Μόνο tasks"}
             </button>
           ))}
+
+          {itemFilter !== "events" && (
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={() => setTypeFilterOpen((o) => !o)}
+                style={{
+                  padding: "5px 12px",
+                  fontSize: 12,
+                  borderRadius: 999,
+                  border: "1px solid var(--line)",
+                  background: selectedTaskTypes.size < ALL_TASK_TYPES.length ? "var(--ink)" : "transparent",
+                  color: selectedTaskTypes.size < ALL_TASK_TYPES.length ? "#fff" : "var(--ink-soft)",
+                }}
+              >
+                <i className="ti ti-filter" style={{ fontSize: 13, marginRight: 4, verticalAlign: -2 }} />
+                Τύπος task
+              </button>
+
+              {typeFilterOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    left: 0,
+                    zIndex: 20,
+                    background: "var(--card)",
+                    border: "1px solid var(--line)",
+                    borderRadius: 10,
+                    padding: 10,
+                    minWidth: 200,
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <div style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 11 }}>
+                    <button
+                      onClick={() => setSelectedTaskTypes(new Set(ALL_TASK_TYPES))}
+                      style={{ background: "none", border: "none", color: "var(--ink-soft)", textDecoration: "underline" }}
+                    >
+                      Επιλογή όλων
+                    </button>
+                    <button
+                      onClick={() => setSelectedTaskTypes(new Set())}
+                      style={{ background: "none", border: "none", color: "var(--ink-soft)", textDecoration: "underline" }}
+                    >
+                      Καμία
+                    </button>
+                  </div>
+                  {ALL_TASK_TYPES.map((tt) => (
+                    <label
+                      key={tt}
+                      style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, padding: "4px 0", cursor: "pointer" }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTaskTypes.has(tt)}
+                        onChange={(e) => {
+                          setSelectedTaskTypes((prev) => {
+                            const next = new Set(prev);
+                            if (e.target.checked) next.add(tt);
+                            else next.delete(tt);
+                            return next;
+                          });
+                        }}
+                      />
+                      {TASK_TYPE_LABELS[tt]}
+                    </label>
+                  ))}
+                  <button
+                    onClick={() => setTypeFilterOpen(false)}
+                    style={{
+                      width: "100%",
+                      marginTop: 8,
+                      padding: "6px 0",
+                      borderRadius: 6,
+                      border: "1px solid var(--line)",
+                      background: "transparent",
+                      fontSize: 12,
+                    }}
+                  >
+                    Κλείσιμο
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Date navigation */}
@@ -208,7 +296,7 @@ export default function Planner({ userId }: { userId: string }) {
               const dayTasks =
                 itemFilter === "events"
                   ? []
-                  : visibleTasks.filter((t) => isTaskDueOn(t, day, completions));
+                  : visibleTasks.filter((t) => selectedTaskTypes.has(t.type) && isTaskDueOn(t, day, completions));
 
               if (viewMode !== "day" && dayEvents.length === 0 && dayTasks.length === 0) return null;
 
