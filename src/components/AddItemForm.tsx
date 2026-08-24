@@ -106,6 +106,8 @@ export default function AddItemForm({
         <select value={taskType} onChange={(e) => setTaskType(e.target.value as TaskType)} style={fieldStyle}>
           <option value="once">Εφάπαξ</option>
           <option value="daily">Καθημερινό</option>
+          <option value="weekdays">Εργάσιμες μέρες</option>
+          <option value="daily_except_sunday">Καθημερινά εκτός Κυριακής</option>
           <option value="weekly">Εβδομαδιαίο</option>
           <option value="monthly">Μηνιαίο</option>
         </select>
