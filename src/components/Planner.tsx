@@ -96,6 +96,12 @@ export default function Planner({ userId }: { userId: string }) {
     loadData();
   }
 
+  async function deleteTask(task: Task) {
+    if (!window.confirm(`Διαγραφή "${task.title}"; Θα σταματήσει να εμφανίζεται παντού.`)) return;
+    await supabase.from("tasks").delete().eq("id", task.id);
+    loadData();
+  }
+
   const label = useMemo(() => {
     if (viewMode === "day") return format(anchorDate, "EEEE d MMMM", { locale: el });
     if (viewMode === "week")
@@ -267,16 +273,34 @@ export default function Planner({ userId }: { userId: string }) {
 
         {/* Date navigation */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "10px 0" }}>
-          <button onClick={() => stepDate(-1)} style={navBtn}>
+          <button onClick={() => stepDate(-1)} style={navBtn} aria-label={viewMode === "day" ? "Προηγούμενη ημέρα" : viewMode === "week" ? "Προηγούμενη εβδομάδα" : "Προηγούμενος μήνας"}>
             <i className="ti ti-chevron-left" />
           </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {viewMode !== "day" && (
+              <button
+                onClick={() => setAnchorDate((d) => addDays(d, -1))}
+                style={smallNavBtn}
+                aria-label="Προηγούμενη ημέρα"
+              >
+                <i className="ti ti-chevron-left" style={{ fontSize: 13 }} />
+              </button>
+            )}
             <span style={{ fontWeight: 500, fontSize: 15, textTransform: "capitalize" }}>{label}</span>
-            <button onClick={() => setAnchorDate(new Date())} style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none" }}>
+            {viewMode !== "day" && (
+              <button
+                onClick={() => setAnchorDate((d) => addDays(d, 1))}
+                style={smallNavBtn}
+                aria-label="Επόμενη ημέρα"
+              >
+                <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+              </button>
+            )}
+            <button onClick={() => setAnchorDate(new Date())} style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none", marginLeft: 4 }}>
               σήμερα
             </button>
           </div>
-          <button onClick={() => stepDate(1)} style={navBtn}>
+          <button onClick={() => stepDate(1)} style={navBtn} aria-label={viewMode === "day" ? "Επόμενη ημέρα" : viewMode === "week" ? "Επόμενη εβδομάδα" : "Επόμενος μήνας"}>
             <i className="ti ti-chevron-right" />
           </button>
         </div>
@@ -371,6 +395,22 @@ export default function Planner({ userId }: { userId: string }) {
                               {tab === "general" ? ` · ${DOMAINS.find((d) => d.key === task.domain)?.label}` : ""}
                             </div>
                           </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteTask(task);
+                            }}
+                            aria-label="Διαγραφή task"
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "var(--ink-soft)",
+                              padding: 4,
+                              flexShrink: 0,
+                            }}
+                          >
+                            <i className="ti ti-trash" style={{ fontSize: 15 }} />
+                          </button>
                         </div>
                       );
                     })}
@@ -452,4 +492,13 @@ const navBtn: React.CSSProperties = {
   fontSize: 18,
   color: "var(--ink-soft)",
   padding: 6,
+};
+
+const smallNavBtn: React.CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "var(--ink-soft)",
+  padding: 2,
+  display: "flex",
+  alignItems: "center",
 };
