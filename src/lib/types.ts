@@ -1,5 +1,5 @@
 export type Domain = "work" | "university" | "scouting" | "personal";
-export type TaskType = "daily" | "weekly" | "monthly" | "once";
+export type TaskType = "daily" | "weekly" | "monthly" | "once" | "weekdays" | "daily_except_sunday";
 export type ViewMode = "day" | "week" | "month";
 
 export interface DomainConfig {
@@ -21,6 +21,8 @@ export const TASK_TYPE_LABELS: Record<TaskType, string> = {
   weekly: "Εβδομαδιαίο",
   monthly: "Μηνιαίο",
   once: "Εφάπαξ",
+  weekdays: "Εργάσιμες μέρες",
+  daily_except_sunday: "Καθημερινά εκτός Κυριακής",
 };
 
 export interface Task {
