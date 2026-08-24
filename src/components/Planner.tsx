@@ -24,6 +24,7 @@ type TabKey = Domain | "general";
 export default function Planner({ userId }: { userId: string }) {
   const [tab, setTab] = useState<TabKey>("general");
   const [viewMode, setViewMode] = useState<ViewMode>("day");
+  const [itemFilter, setItemFilter] = useState<"all" | "events" | "tasks">("all");
   const [anchorDate, setAnchorDate] = useState(new Date());
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completions, setCompletions] = useState<TaskCompletion[]>([]);
@@ -156,6 +157,26 @@ export default function Planner({ userId }: { userId: string }) {
           ))}
         </div>
 
+        {/* Item filter */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {(["all", "events", "tasks"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setItemFilter(f)}
+              style={{
+                padding: "5px 12px",
+                fontSize: 12,
+                borderRadius: 999,
+                border: "1px solid var(--line)",
+                background: itemFilter === f ? "var(--ink)" : "transparent",
+                color: itemFilter === f ? "#fff" : "var(--ink-soft)",
+              }}
+            >
+              {f === "all" ? "Όλα" : f === "events" ? "Μόνο events" : "Μόνο tasks"}
+            </button>
+          ))}
+        </div>
+
         {/* Date navigation */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "10px 0" }}>
           <button onClick={() => stepDate(-1)} style={navBtn}>
@@ -178,10 +199,16 @@ export default function Planner({ userId }: { userId: string }) {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: viewMode === "day" ? 8 : 18 }}>
             {days.map((day) => {
-              const dayEvents = visibleEvents
-                .filter((e) => isSameDay(new Date(e.event_date), day))
-                .sort((a, b) => a.start_time.localeCompare(b.start_time));
-              const dayTasks = visibleTasks.filter((t) => isTaskDueOn(t, day, completions));
+              const dayEvents =
+                itemFilter === "tasks"
+                  ? []
+                  : visibleEvents
+                      .filter((e) => isSameDay(new Date(e.event_date), day))
+                      .sort((a, b) => a.start_time.localeCompare(b.start_time));
+              const dayTasks =
+                itemFilter === "events"
+                  ? []
+                  : visibleTasks.filter((t) => isTaskDueOn(t, day, completions));
 
               if (viewMode !== "day" && dayEvents.length === 0 && dayTasks.length === 0) return null;
 
