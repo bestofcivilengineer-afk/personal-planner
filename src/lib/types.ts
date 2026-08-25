@@ -10,10 +10,10 @@ export interface DomainConfig {
 }
 
 export const DOMAINS: DomainConfig[] = [
-  { key: "work", label: "Δουλειά", icon: "ti-briefcase", color: "#3D5A80" },
-  { key: "university", label: "Πανεπιστήμιο", icon: "ti-school", color: "#B5891C" },
-  { key: "scouting", label: "Προσκοπικό", icon: "ti-tent", color: "#2F6B4F" },
-  { key: "personal", label: "Προσωπικά", icon: "ti-user", color: "#7A4869" },
+  { key: "work", label: "Δουλειά", icon: "💼", color: "#3D5A80" },
+  { key: "university", label: "Πανεπιστήμιο", icon: "🎓", color: "#B5891C" },
+  { key: "scouting", label: "Προσκοπικό", icon: "⛺", color: "#2F6B4F" },
+  { key: "personal", label: "Προσωπικά", icon: "👤", color: "#7A4869" },
 ];
 
 export const TASK_TYPE_LABELS: Record<TaskType, string> = {
