@@ -18,8 +18,9 @@ import {
 } from "date-fns";
 import { el } from "date-fns/locale";
 import AddItemForm from "./AddItemForm";
+import NotesPanel from "./NotesPanel";
 
-type TabKey = Domain | "general";
+type TabKey = Domain | "general" | "notes";
 
 export default function Planner({ userId }: { userId: string }) {
   const [tab, setTab] = useState<TabKey>("general");
@@ -83,6 +84,7 @@ export default function Planner({ userId }: { userId: string }) {
   async function toggleTask(task: Task, date: Date, done: boolean) {
     const dateStr = format(date, "yyyy-MM-dd");
     if (done) {
+      // remove completion(s) for that date (or any completion if "once")
       const toRemove = completions.filter(
         (c) => c.task_id === task.id && (task.type === "once" || c.completed_on === dateStr)
       );
@@ -141,8 +143,18 @@ export default function Planner({ userId }: { userId: string }) {
             onClick={() => setTab(d.key)}
           />
         ))}
+        <TabButton
+          active={tab === "notes"}
+          label="Σημειώσεις"
+          icon="📝"
+          color="var(--accent-general)"
+          onClick={() => setTab("notes")}
+        />
       </div>
 
+      {tab === "notes" ? (
+        <NotesPanel userId={userId} />
+      ) : (
       <div style={{ padding: "0 16px" }}>
         {/* View mode toggle */}
         <div style={{ display: "flex", gap: 6, margin: "14px 0 10px" }}>
@@ -447,6 +459,7 @@ export default function Planner({ userId }: { userId: string }) {
           </button>
         )}
       </div>
+      )}
     </div>
   );
 }

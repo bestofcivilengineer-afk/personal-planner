@@ -49,3 +49,18 @@ export interface EventItem {
   end_time: string | null;
   location: string | null;
 }
+
+export interface NoteTopic {
+  id: string;
+  title: string;
+  created_at: string;
+}
+
+export interface NoteItem {
+  id: string;
+  topic_id: string;
+  text: string;
+  done: boolean;
+  created_at: string;
+  done_at: string | null;
+}
