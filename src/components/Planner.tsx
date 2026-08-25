@@ -83,7 +83,6 @@ export default function Planner({ userId }: { userId: string }) {
   async function toggleTask(task: Task, date: Date, done: boolean) {
     const dateStr = format(date, "yyyy-MM-dd");
     if (done) {
-      // remove completion(s) for that date (or any completion if "once")
       const toRemove = completions.filter(
         (c) => c.task_id === task.id && (task.type === "once" || c.completed_on === dateStr)
       );
