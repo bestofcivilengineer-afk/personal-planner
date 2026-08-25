@@ -197,8 +197,7 @@ export default function Planner({ userId }: { userId: string }) {
                   color: selectedTaskTypes.size < ALL_TASK_TYPES.length ? "#fff" : "var(--ink-soft)",
                 }}
               >
-                <i className="ti ti-filter" style={{ fontSize: 13, marginRight: 4, verticalAlign: -2 }} />
-                Τύπος task
+                Τύπος task ▾
               </button>
 
               {typeFilterOpen && (
@@ -273,7 +272,7 @@ export default function Planner({ userId }: { userId: string }) {
         {/* Date navigation */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "10px 0" }}>
           <button onClick={() => stepDate(-1)} style={navBtn} aria-label={viewMode === "day" ? "Προηγούμενη ημέρα" : viewMode === "week" ? "Προηγούμενη εβδομάδα" : "Προηγούμενος μήνας"}>
-            <i className="ti ti-chevron-left" />
+            <ChevronLeft />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {viewMode !== "day" && (
@@ -282,7 +281,7 @@ export default function Planner({ userId }: { userId: string }) {
                 style={smallNavBtn}
                 aria-label="Προηγούμενη ημέρα"
               >
-                <i className="ti ti-chevron-left" style={{ fontSize: 13 }} />
+                <ChevronLeft small />
               </button>
             )}
             <span style={{ fontWeight: 500, fontSize: 15, textTransform: "capitalize" }}>{label}</span>
@@ -292,7 +291,7 @@ export default function Planner({ userId }: { userId: string }) {
                 style={smallNavBtn}
                 aria-label="Επόμενη ημέρα"
               >
-                <i className="ti ti-chevron-right" style={{ fontSize: 13 }} />
+                <ChevronRight small />
               </button>
             )}
             <button onClick={() => setAnchorDate(new Date())} style={{ fontSize: 12, color: "var(--ink-soft)", background: "none", border: "none", marginLeft: 4 }}>
@@ -300,7 +299,7 @@ export default function Planner({ userId }: { userId: string }) {
             </button>
           </div>
           <button onClick={() => stepDate(1)} style={navBtn} aria-label={viewMode === "day" ? "Επόμενη ημέρα" : viewMode === "week" ? "Επόμενη εβδομάδα" : "Επόμενος μήνας"}>
-            <i className="ti ti-chevron-right" />
+            <ChevronRight />
           </button>
         </div>
 
@@ -346,7 +345,7 @@ export default function Planner({ userId }: { userId: string }) {
                           borderLeft: `3px solid var(--accent-${ev.domain})`,
                         }}
                       >
-                        <i className="ti ti-clock" style={{ fontSize: 16, marginTop: 2, color: `var(--accent-${ev.domain})` }} />
+                        <span style={{ fontSize: 14, marginTop: 1 }}>🕐</span>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontSize: 13, fontWeight: 500 }}>{ev.title}</div>
                           <div style={{ fontSize: 11, color: "var(--ink-soft)" }}>
@@ -408,7 +407,7 @@ export default function Planner({ userId }: { userId: string }) {
                               flexShrink: 0,
                             }}
                           >
-                            <i className="ti ti-trash" style={{ fontSize: 15 }} />
+                            🗑
                           </button>
                         </div>
                       );
@@ -443,7 +442,7 @@ export default function Planner({ userId }: { userId: string }) {
               fontSize: 14,
             }}
           >
-            <i className="ti ti-plus" style={{ marginRight: 6 }} />
+            <span style={{ marginRight: 6 }}>+</span>
             Νέα προσθήκη
           </button>
         )}
@@ -479,7 +478,7 @@ function TabButton({
         fontWeight: active ? 500 : 400,
       }}
     >
-      {icon && <i className={`ti ${icon}`} style={{ marginRight: 4, verticalAlign: -2 }} />}
+      {icon && <span style={{ marginRight: 4 }}>{icon}</span>}
       {label}
     </button>
   );
@@ -501,3 +500,21 @@ const smallNavBtn: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
 };
+
+function ChevronLeft({ small }: { small?: boolean }) {
+  const s = small ? 13 : 18;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  );
+}
+
+function ChevronRight({ small }: { small?: boolean }) {
+  const s = small ? 13 : 18;
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
